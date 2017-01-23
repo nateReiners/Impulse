@@ -38,7 +38,7 @@ In addition to the webpack entry file, there will be two scripts involved in thi
 
 `board.js`: this script will handle the logic for creating and updating the necessary `Easel.js` elements and rendering them to the DOM.
 
-`object.js`: This will include code for all objects. Each `Object` will contain a `type` (obstacle or power-up) and an `aliveState` (`true` or `false`).
+`object.js`: This will include code for all objects. Each `Object` will contain a `type` (user, obstacle or power-up).
 
 ### Implementation Timeline
 
