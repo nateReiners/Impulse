@@ -70,6 +70,7 @@ In addition to the webpack entry file, there will be two scripts involved in thi
 
 Time permitting, I'd like to implement the following features. Some anticipated updates are:
 
+- [ ] Give 'user' object a tail which traces previous movement
 - [ ] Change the colors of background and obstacles.
 - [ ] Add bonus which gives vulnerability for a limited amount of time.
 - [ ] Add bonus which immediately destroys all obstacles on page.
