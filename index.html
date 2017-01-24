@@ -10,26 +10,22 @@
       }
 
       #canvas {
+        cursor: crosshair;
       }
     </style>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
     <script>
       function init() {
+          // Music: http://www.bensound.com
+          const music = new Audio("./assets/audio/slowmotion.mp3");
+          // music.play();
+
+
            var canvas = document.getElementById('canvas');
+           const context = canvas.getContext('2d');
            var stage = new createjs.Stage("canvas");
            canvas.style.background = 'black';
-           var circles = [];
 
-           function Circle(radius, speed, xPos, yPos) {
-             this.radius = radius;
-             this.speed = speed;
-             this.xPos = xPos;
-             this.yPos = yPos;
-             this.opacity = .8 + Math.random() * .8;
-
-             this.counter = 0;
-
-           }
 
            function getMousePos(canvas, evt) {
               var rect = canvas.getBoundingClientRect();
@@ -39,33 +35,83 @@
               };
             }
             canvas.addEventListener('mousemove', function(evt) {
-              var mousePos = getMousePos(canvas, evt);
-              var userCircle = new createjs.Shape();
+                let mousePos = getMousePos(canvas, evt);
+                let userCircle = new createjs.Shape();
+                userCircle.time = createjs.Ticker.getTime();
+                userCircle.name = "userCircle";
                 userCircle.graphics.beginFill("lightblue").drawCircle(0,0, 3);
                 userCircle.x = mousePos.x;
                 userCircle.y = mousePos.y;
                 stage.addChild(userCircle);
-                stage.update();
+
+                let tail = new createjs.Shape();
+                tail.name = 'tail';
+                tail.time = createjs.Ticker.getTime();
+                tail.graphics.beginFill("yellow").drawCircle(0,0,1);
+                tail.x = mousePos.x;
+                tail.y = mousePos.y;
+                stage.addChild(tail);
+
               console.log('Mouse position: ' + mousePos.x + ',' + mousePos.y);
             }, false);
 
 
-             var circle = new createjs.Shape();
-             circle.graphics.beginFill("red").drawCircle(0,0, 5);
-             circle.x = Math.floor(Math.random() * 600);
-             circle.y = Math.floor(Math.random() * 300);
-             stage.addChild(circle);
-             stage.update();
+            for ( let i = 0; i < 75; i++ ) {
+              var circle = new createjs.Shape();
+              var sizes = [4, 4];
+              var colors = ["#DAF7A6", "#FFC300", "#FF5733", "#C70039", "#900C3F"]
+              var size = sizes[Math.floor(Math.random() * sizes.length)];
+              var color = colors[Math.floor(Math.random() * colors.length)];
+              circle.graphics.beginFill(color).drawCircle(0,0, size);
+                //along top (y0 x0-600)
+                circle.x = Math.floor(Math.random() * 600);
+                circle.y = Math.floor(Math.random() * 300) - 300;
+
+              circle.name = "obstacle";
+              circle.time = createjs.Ticker.getTime();
+              circle.setBounds(circle.x, circle.y, 2, 2);
+              stage.addChild(circle);
+            }
 
            createjs.Ticker.addEventListener("tick", tick);
-           createjs.Ticker.setInterval(30);
 
            function tick(event) {
-             console.log("tick");
-             circle.x -= event.delta/1000*100;
-             circle.y += event.delta/1000*100;
-             if (circle.y > stage.canvas.height ) { circle.y = 0 }
-             if (circle.x < 0) { circle.x = stage.canvas.width; }
+
+             function getMousePos(canvas, evt) {
+                var rect = canvas.getBoundingClientRect();
+                return {
+                  x: evt.clientX - rect.left,
+                  y: evt.clientY - rect.top
+                };
+              }
+
+             for (let i = 0; i<stage.children.length; i++) {
+               const currentChild = stage.getChildAt(i);
+               if (currentChild.name === "userCircle") {
+                 if (i < stage.children.length - 2) {
+                   stage.removeChild(currentChild);
+                 }
+               } else if (currentChild.name === 'tail') {
+                 let currentTime = createjs.Ticker.getTime();
+                 if (currentChild.time < currentTime - 200) {
+                   stage.removeChild(currentChild);
+                 }
+               } else if (currentChild.name === 'obstacle') {
+                 currentChild.x -= event.delta/1000*100;
+                 currentChild.y += event.delta/1000*100;
+                 if (currentChild.y > stage.canvas.height ) { currentChild.y = 0 }
+                 if (currentChild.x < 0) { currentChild.x = stage.canvas.width; }
+                 let currentTime = createjs.Ticker.getTime();
+                 let elapsedTime = (currentTime - currentChild.time)/1000;
+
+                 currentChild.x -= (event.delta/1000) - 4;
+                 currentChild.y += (event.delta/1000) - 4;
+
+
+                 console.log(currentChild.getBounds());
+
+               }
+             }
              stage.update();
            }
          }
