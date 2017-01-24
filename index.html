@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        margin: 50px;
+        padding: 0px;
+      }
+
+      #canvas {
+        border: 5px solid gray;
+      }
+    </style>
+    <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+    <script>
+      function init() {
+           var canvas = document.getElementById('canvas');
+           var stage = new createjs.Stage("canvas");
+           canvas.style.background = 'black';
+           var circles = [];
+
+           function Circle(radius, speed, xPos, yPos) {
+             this.radius = radius;
+             this.speed = speed;
+             this.xPos = xPos;
+             this.yPos = yPos;
+             this.opacity = .8 + Math.random() * .8;
+
+             this.counter = 0;
+
+           }
+
+
+             var circle = new createjs.Shape();
+             circle.graphics.beginFill("red").drawCircle(0,0, 5);
+             circle.x = Math.floor(Math.random() * 550) + 400;
+             circle.y = Math.floor(Math.random() * 300) + 250;
+             stage.addChild(circle)
+             stage.update();
+
+           createjs.Ticker.addEventListener("tick", tick);
+           createjs.Ticker.setInterval(30);
+
+           function tick(event) {
+             console.log("tick");
+             circle.x -= event.delta/1000*100;
+             circle.y += event.delta/1000*100;
+             if (circle.y > stage.canvas.height ) { circle.y = 0 }
+             if (circle.x < 0) { circle.x = stage.canvas.width; }
+             stage.update();
+           }
+         }
+
+         function togglePause() {
+      			var paused = !createjs.Ticker.getPaused();
+      			createjs.Ticker.setPaused(paused);
+      			document.getElementById("pauseBtn").value = paused ? "unpause" : "pause";
+      		}
+
+
+    </script>
+  </head>
+
+  <body onLoad="init();">
+    <canvas id="canvas" width="600" height="300">
+    </canvas>
+  </body>
+
+</html>
