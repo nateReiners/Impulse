@@ -10,7 +10,6 @@
       }
 
       #canvas {
-        border: 5px solid gray;
       }
     </style>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
@@ -32,12 +31,30 @@
 
            }
 
+           function getMousePos(canvas, evt) {
+              var rect = canvas.getBoundingClientRect();
+              return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+              };
+            }
+            canvas.addEventListener('mousemove', function(evt) {
+              var mousePos = getMousePos(canvas, evt);
+              var userCircle = new createjs.Shape();
+                userCircle.graphics.beginFill("lightblue").drawCircle(0,0, 3);
+                userCircle.x = mousePos.x;
+                userCircle.y = mousePos.y;
+                stage.addChild(userCircle);
+                stage.update();
+              console.log('Mouse position: ' + mousePos.x + ',' + mousePos.y);
+            }, false);
+
 
              var circle = new createjs.Shape();
              circle.graphics.beginFill("red").drawCircle(0,0, 5);
-             circle.x = Math.floor(Math.random() * 550) + 400;
-             circle.y = Math.floor(Math.random() * 300) + 250;
-             stage.addChild(circle)
+             circle.x = Math.floor(Math.random() * 600);
+             circle.y = Math.floor(Math.random() * 300);
+             stage.addChild(circle);
              stage.update();
 
            createjs.Ticker.addEventListener("tick", tick);
@@ -53,11 +70,7 @@
            }
          }
 
-         function togglePause() {
-      			var paused = !createjs.Ticker.getPaused();
-      			createjs.Ticker.setPaused(paused);
-      			document.getElementById("pauseBtn").value = paused ? "unpause" : "pause";
-      		}
+
 
 
     </script>
