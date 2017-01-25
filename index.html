@@ -52,6 +52,7 @@
                 userCircle.time = createjs.Ticker.getTime();
                 userCircle.name = "userCircle";
                 userCircle.graphics.beginFill("lightblue").drawCircle(1, 1, 4);
+                userCircle.size = 2;
                 userCircle.x = mousePos.x;
                 userCircle.y = mousePos.y;
                 stage.addChild(userCircle);
@@ -95,7 +96,7 @@
 
               circle.name = "obstacle";
               circle.time = createjs.Ticker.getTime();
-              circle.setBounds(circle.x, circle.y, (size/2), (size/2));
+              circle.setBounds(circle.x, circle.y, size, size);
               stage.addChild(circle);
             }
 
@@ -112,8 +113,8 @@
               }
 
             function checkCollision(obj1, obj2) {
-              if (obj1.x >= (obj2.x - obj2.size/2) && obj1.x <= obj2.x + (obj2.size/2)) {
-                if (obj1.y >= (obj2.y - obj2.size/2) && obj1.y <= obj2.y + (obj2.size/2)) {
+              if ((obj1.x + obj1.size) >= (obj2.x - obj2.size) && (obj1.x - obj1.size) <= (obj2.x + obj2.size)) {
+                if ((obj1.y + obj1.size) >= (obj2.y - obj2.size) && (obj1.y - obj1.size) <= (obj2.y + obj2.size)) {
                   return true;
                 }
               }
