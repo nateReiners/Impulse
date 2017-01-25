@@ -18,13 +18,25 @@
       function init() {
           // Music: http://www.bensound.com
           const music = new Audio("./assets/audio/slowmotion.mp3");
-          // music.play();
+          music.play();
 
 
            var canvas = document.getElementById('canvas');
            const context = canvas.getContext('2d');
            var stage = new createjs.Stage("canvas");
            canvas.style.background = 'black';
+
+           var stars = 150;
+           for (var i = 0; i < stars; i++) {
+                x = Math.random() * canvas.offsetWidth;
+                y = Math.random() * canvas.offsetHeight;
+                let star = new createjs.Shape();
+                star.name = "star";
+                star.graphics.beginFill("white")
+                star.graphics.drawRect(x,y,1,1);
+                star.graphics.endFill();
+                stage.addChild(star);
+            }
 
 
            function getMousePos(canvas, evt) {
@@ -39,7 +51,7 @@
                 let userCircle = new createjs.Shape();
                 userCircle.time = createjs.Ticker.getTime();
                 userCircle.name = "userCircle";
-                userCircle.graphics.beginFill("lightblue").drawCircle(0,0, 3);
+                userCircle.graphics.beginFill("lightblue").drawCircle(1, 1, 4);
                 userCircle.x = mousePos.x;
                 userCircle.y = mousePos.y;
                 stage.addChild(userCircle);
@@ -47,29 +59,43 @@
                 let tail = new createjs.Shape();
                 tail.name = 'tail';
                 tail.time = createjs.Ticker.getTime();
-                tail.graphics.beginFill("yellow").drawCircle(0,0,1);
+                tail.graphics.beginFill("yellow").drawCircle(0, 0, 2);
+                tail.graphics.beginStroke("red").drawCircle(0, 0, 2);
+
                 tail.x = mousePos.x;
                 tail.y = mousePos.y;
                 stage.addChild(tail);
+
+                let blurryFilter = new createjs.BlurFilter(5, 5);
+                tail.filters = [blurryFilter];
+                let bounds = blurryFilter.getBounds();
+                tail.cache(-50 + bounds.x, -50 + bounds.y, 100 + bounds.width, 100 + bounds.height);
 
               console.log('Mouse position: ' + mousePos.x + ',' + mousePos.y);
             }, false);
 
 
-            for ( let i = 0; i < 75; i++ ) {
+            for ( let i = 0; i < 200; i++ ) {
               var circle = new createjs.Shape();
-              var sizes = [4, 4];
+              var sizes = [2, 3, 4];
               var colors = ["#DAF7A6", "#FFC300", "#FF5733", "#C70039", "#900C3F"]
               var size = sizes[Math.floor(Math.random() * sizes.length)];
               var color = colors[Math.floor(Math.random() * colors.length)];
               circle.graphics.beginFill(color).drawCircle(0,0, size);
-                //along top (y0 x0-600)
-                circle.x = Math.floor(Math.random() * 600);
-                circle.y = Math.floor(Math.random() * 300) - 300;
+                //along top (y0 x0-1024)
+                circle.x = Math.floor(Math.random() * 1024);
+                circle.y = Math.floor(Math.random() * 550) - 550;
+              if (size === 2) {
+                circle.size = 2;
+              } else if (size === 3) {
+                circle.size = 3;
+              } else {
+                circle.size = 4;
+              }
 
               circle.name = "obstacle";
               circle.time = createjs.Ticker.getTime();
-              circle.setBounds(circle.x, circle.y, 2, 2);
+              circle.setBounds(circle.x, circle.y, (size/2), (size/2));
               stage.addChild(circle);
             }
 
@@ -85,15 +111,30 @@
                 };
               }
 
-             for (let i = 0; i<stage.children.length; i++) {
+            function checkCollision(obj1, obj2) {
+              if (obj1.x >= (obj2.x - obj2.size/2) && obj1.x <= obj2.x + (obj2.size/2)) {
+                if (obj1.y >= (obj2.y - obj2.size/2) && obj1.y <= obj2.y + (obj2.size/2)) {
+                  return true;
+                }
+              }
+              return false;
+            };
+
+             for ( let i = 0; i < stage.children.length; i++ ) {
                const currentChild = stage.getChildAt(i);
                if (currentChild.name === "userCircle") {
                  if (i < stage.children.length - 2) {
                    stage.removeChild(currentChild);
+                   for ( let i = 0; i < stage.children.length; i ++ ) {
+                     let currentObstacle = stage.getChildAt(i);
+                     if (checkCollision(currentChild, currentObstacle)) {
+                       console.log("COLLISION DETECTED!");
+                     }
+                   }
                  }
                } else if (currentChild.name === 'tail') {
                  let currentTime = createjs.Ticker.getTime();
-                 if (currentChild.time < currentTime - 200) {
+                 if (currentChild.time < currentTime - 150) {
                    stage.removeChild(currentChild);
                  }
                } else if (currentChild.name === 'obstacle') {
@@ -104,12 +145,8 @@
                  let currentTime = createjs.Ticker.getTime();
                  let elapsedTime = (currentTime - currentChild.time)/1000;
 
-                 currentChild.x -= (event.delta/1000) - 4;
-                 currentChild.y += (event.delta/1000) - 4;
-
-
-                 console.log(currentChild.getBounds());
-
+                 currentChild.x -= (event.delta/1000 * elapsedTime) - (currentChild.size + 1);
+                 currentChild.y += (event.delta/1000 * elapsedTime) - (currentChild.size + 1);
                }
              }
              stage.update();
@@ -123,7 +160,7 @@
   </head>
 
   <body onLoad="init();">
-    <canvas id="canvas" width="600" height="300">
+    <canvas id="canvas" width="1024" height="550">
     </canvas>
   </body>
 
