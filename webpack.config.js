@@ -2,11 +2,21 @@ module.exports = {
     entry: "./lib/entry.js",
     output: {
         path: __dirname,
-        filename: "bundle.js"
+        filename: "./lib/bundle.js"
     },
-    module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" }
-        ]
+    resolve: {
+    extensions: ["", ".js"]
+  },
+  devtool: 'source-map',
+  module: {
+    loaders: [
+    {
+      exclude: /(node_modules|bower_components)/,
+      loader: 'babel',
+      query: {
+        presets: ['es2015']
+      }
     }
+    ]
+  }
 };
